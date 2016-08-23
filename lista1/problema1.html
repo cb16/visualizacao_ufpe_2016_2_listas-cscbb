@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <title>Lista 1 - Problema 1</title>
+        <script type="text/javascript" src="../d3/d3.min.js"></script>
+    </head>
+    <body>
+        Species: <input type="text" id="species" value="setosa"/>
+        </br>
+        </br>
+        Column Name: <input type="text" id="column" value="Sepal.Length"/>
+        </br>
+        </br>
+        <button type="submit" onclick="javascript:getMinimum()">Get Minimum</button>
+        <button type="submit" onclick="javascript:getAverage()">Get Average</button>
+        <button type="submit" onclick="javascript:getMaximumNotIn()">Get Maximum Not In</button>
+        <h3>Result:</h3>
+        <p id="result"></p>
+        <script src="http://www.cin.ufpe.br/~nivan/teaching/data_vis/fall_2016/material/iris.js"></script>
+        <script type="text/javascript" src="problema1.js"></script>
+    </body>
+</html>
