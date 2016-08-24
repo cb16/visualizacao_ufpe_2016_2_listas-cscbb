@@ -18,12 +18,10 @@ function getAverage() {
   var filteredBySpecies = iris.filter(function(value) {
     return species.indexOf(value.Species) != -1;
   });
-  var keep = 0;
   var sum = filteredBySpecies.reduce(function(pre, cur) {
-    keep = keep + cur[column];
-    return cur;
-  });
-  var average = keep / filteredBySpecies.length;
+    return pre + cur[column];
+  }, 0);
+  var average = sum / filteredBySpecies.length;
   d3.select("p").text(average);
 }
 
