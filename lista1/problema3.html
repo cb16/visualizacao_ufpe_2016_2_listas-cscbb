@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <title>Lista 1 - Problema 3</title>
+        <script type="text/javascript" src="../d3/d3.min.js"></script>
+    </head>
+    <body>
+      First column name: <input type="text" id="col1" value="Petal.Width" />
+      </br>
+      </br>
+      Second column name: <input type="text" id="col2" value="Petal.Length" />
+      </br>
+      </br>
+      <button type="submit" onclick="javascript:scatterplot()">Generate!</button>
+      </br>
+      </br>
+      <svg width="500" height="500">
+        <g transform="translate(0,500) scale(1,-1)">
+        </g>
+      </svg>
+      <script src="http://www.cin.ufpe.br/~nivan/teaching/data_vis/fall_2016/material/iris.js"></script>
+      <script src="problema3.js"></script>
+    </body>
+</html>
