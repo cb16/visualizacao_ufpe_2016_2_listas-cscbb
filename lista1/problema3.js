@@ -43,7 +43,20 @@ function scatterplot() {
   console.log("max in col1 -> " + maxCol1);
   console.log("max in col2 -> " + maxCol2);
 
+  //clearing svg
+  svg.selectAll("text").remove();
   svg.selectAll("circle").data(iris).remove();
+
+  d3.select("svg").append("text")
+  .attr("x", 10)
+  .attr("y", 200)
+  .text(c1)
+  .attr("transform", "rotate(-90 11 200)");
+
+  d3.select("svg").append("text")
+  .attr("x", 200)
+  .attr("y", 497)
+  .text(c2);
 
   svg.selectAll("circle").data(iris).enter().append("circle")
   .attr("cx", function(d){
