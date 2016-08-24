@@ -1,8 +1,12 @@
 function scatterplot() {
   var c1 = document.getElementById("col1").value;
   var c2 = document.getElementById("col2").value;
-  console.log("cols= " + c1 + " " + c2);
   var svg = d3.select("g");
+
+  //clearing svg
+  d3.select("svg").selectAll("text").remove();
+  svg.selectAll("*").remove();
+
   var size = 400;
   svg.append("line")
   .attr("x1", 20)
@@ -23,6 +27,12 @@ function scatterplot() {
 
   var maxCol1 = iris.map(c => c[c1]).reduce(function(pre, cur){return (pre > cur ? pre : cur)},0);
   var maxCol2 = iris.map(c => c[c2]).reduce(function(pre, cur){return (pre > cur ? pre : cur)},0);
+  var minCol1 = iris.map(c => c[c1]).reduce(function(pre, cur){return (pre < cur ? pre : cur)},100);
+  var minCol2 = iris.map(c => c[c2]).reduce(function(pre, cur){return (pre < cur ? pre : cur)},100);
+
+  console.log("mins " + minCol1 + " " + minCol2);
+  console.log("max in col1 -> " + maxCol1);
+  console.log("max in col2 -> " + maxCol2);
 
   svg.append("line")
   .attr("x1", 10)
@@ -40,12 +50,26 @@ function scatterplot() {
   .attr("stroke-width", 5)
   .attr("stroke", "black");
 
-  console.log("max in col1 -> " + maxCol1);
-  console.log("max in col2 -> " + maxCol2);
+  svg.append("line")
+  .attr("x1", 10)
+  .attr("y1", ((400*minCol2) / maxCol2) + 20)
+  .attr("x2", 30)
+  .attr("y2", ((400*minCol2) / maxCol2) + 20)
+  .attr("stroke-width", 5)
+  .attr("stroke", "black");
 
-  //clearing svg
-  svg.selectAll("text").remove();
-  svg.selectAll("circle").data(iris).remove();
+  svg.append("line")
+  .attr("x1", ((400*minCol1) / maxCol1) + 20)
+  .attr("y1", 10)
+  .attr("x2", ((400*minCol1) / maxCol1) + 20)
+  .attr("y2", 30)
+  .attr("stroke-width", 5)
+  .attr("stroke", "black");
+
+  svg.append("text").attr("x", 0).attr("y", ((400*minCol2)/maxCol2 + 20)).text(minCol2);
+  svg.append("text").attr("x", 0).attr("y", ((400*maxCol1)/maxCol1 + 20)).text(maxCol1);
+  svg.append("text").attr("x", ((400*minCol1)/maxCol1 + 20)).attr("y", 10).text(minCol1);
+  svg.append("text").attr("x", ((400*maxCol2)/maxCol2 + 20)).attr("y", 10).text(maxCol2);
 
   d3.select("svg").append("text")
   .attr("x", 10)
