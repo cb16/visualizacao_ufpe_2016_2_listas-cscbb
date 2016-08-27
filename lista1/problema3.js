@@ -52,24 +52,24 @@ function scatterplot() {
 
   svg.append("line")
   .attr("x1", 10)
-  .attr("y1", ((400*minCol2) / maxCol2) + 20)
+  .attr("y1", ((400*minCol1) / maxCol1) + 20)
   .attr("x2", 30)
-  .attr("y2", ((400*minCol2) / maxCol2) + 20)
+  .attr("y2", ((400*minCol1) / maxCol1) + 20)
   .attr("stroke-width", 5)
   .attr("stroke", "black");
 
   svg.append("line")
-  .attr("x1", ((400*minCol1) / maxCol1) + 20)
+  .attr("x1", ((400*minCol2) / maxCol2) + 20)
   .attr("y1", 10)
-  .attr("x2", ((400*minCol1) / maxCol1) + 20)
+  .attr("x2", ((400*minCol2) / maxCol2) + 20)
   .attr("y2", 30)
   .attr("stroke-width", 5)
   .attr("stroke", "black");
 
-  svg.append("text").attr("x", 0).attr("y", ((400*minCol2)/maxCol2 + 20)).text(minCol2);
-  svg.append("text").attr("x", 0).attr("y", ((400*maxCol1)/maxCol1 + 20)).text(maxCol1);
-  svg.append("text").attr("x", ((400*minCol1)/maxCol1 + 20)).attr("y", 10).text(minCol1);
-  svg.append("text").attr("x", ((400*maxCol2)/maxCol2 + 20)).attr("y", 10).text(maxCol2);
+  d3.select("svg").append("text").attr("x", 0).attr("y", 490 - ((400*minCol1)/maxCol1 + 20)).text(minCol1);
+  d3.select("svg").append("text").attr("x", 0).attr("y", 490 - ((400*maxCol1)/maxCol1 + 20)).text(maxCol1);
+  d3.select("svg").append("text").attr("x", ((400*minCol2)/maxCol2 + 20)).attr("y", 495).text(minCol2);
+  d3.select("svg").append("text").attr("x", ((400*maxCol2)/maxCol2 + 20)).attr("y", 495).text(maxCol2);
 
   d3.select("svg").append("text")
   .attr("x", 10)
@@ -84,10 +84,10 @@ function scatterplot() {
 
   svg.selectAll("circle").data(iris).enter().append("circle")
   .attr("cx", function(d){
-    return ((400*d[c1]) / maxCol1) + 20;
+    return ((400*d[c2]) / maxCol2) + 20;
   })
   .attr("cy", function(d){
-    return ((400*d[c2]) / maxCol2) + 20;
+    return ((400*d[c1]) / maxCol1) + 20;
   })
   .attr("r", 5)
   .attr("fill", function(d){
