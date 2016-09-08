@@ -1,0 +1,6 @@
+Algumas formas de melhorar a visualização seriam:
+  - diminuir o raio dos círculos (alterando o atributo "r" para 2, por exemplo)
+  - colocá-los transparentes (adicionando o atributo "fill-opacity" e setando-o para 0.2, por exemplo)
+  - aumentar o svg.
+Porém é uma solução provisória, pois se o dataset for mais denso, o mesmo problema iria ocorrer.
+Talvez colocar algum tipo de scroll ajudasse nesse sentido.

@@ -3,12 +3,6 @@ var margin = {top: 10, right: 20, bottom: 10, left: 20};
 var width = 900 - margin.left - margin.right;
 var height = 500 - margin.top - margin.bottom;
 
-var dataset = [
-    [5, 20], [480, 90], [250, 50], [100, 33], [330, 95],
-    [410, 12], [475, 44], [25, 67], [85, 21], [220, 88]
-];
-
-
 function renderDataset(){
     //
     var xScale = d3.scaleLinear()
@@ -28,17 +22,17 @@ function renderDataset(){
     var cScale = d3.scaleLinear()
         .domain([0, d3.max(dataset, function(d) { return d[1]; })])
 	.range(["gray","red"]);
-    
-    
+
+
     //
-    var xAxis = d3.axisBottom(xScale).ticks(6);		  
+    var xAxis = d3.axisBottom(xScale).ticks(6);
     var xAxisGroup = d3.select("#xAxis")
 	.transition()
 	.call(xAxis);
 
     //
-    var yAxis = d3.axisLeft(yScale).ticks(6);		  
-    var yAxisGroup = d3.select("#yAxis").transition().call(yAxis);		    		  	
+    var yAxis = d3.axisLeft(yScale).ticks(6);
+    var yAxisGroup = d3.select("#yAxis").transition().call(yAxis);
 
     //
     var circleSelection = svg.select("#circles").selectAll("circle")
@@ -49,7 +43,7 @@ function renderDataset(){
 	.exit()
 	.attr("fill","rgba(255, 255, 255, 0)")
 	.remove();
-    
+
     //Create circles
     circleSelection
 	.enter()
@@ -61,11 +55,12 @@ function renderDataset(){
 	    return yScale(d[1]);
 	})
 	.attr("r", function(d) {
-	    return 10;
+	    return 2;
 	})
 	.attr("fill", function(d){
-	    return "black";
-	});
+	    return "blue";
+	})
+  .attr("fill-opacity", 0.2);
 
     //
     circleSelection
@@ -79,12 +74,13 @@ function renderDataset(){
 	    return yScale(d[1]);
 	})
 	.attr("r", function(d) {
-	    return 10;
+	    return 2;
 	})
 	.attr("fill", function(d){
 	    return "black";
-	});
-    
+	})
+  .attr("fill-opacity", 0.2);
+
 }
 
 
@@ -96,7 +92,7 @@ function init(){
 	.on("click", function() {
 	    renderDataset();
 	});
-    
+
     //Create SVG element
     var crudeSVG = d3.select("body")
 	.append("svg");
@@ -109,13 +105,13 @@ function init(){
 
     //
     var circlesGroup = svg.append("g").attr("id","circles");
-    
+
     //
     svg.append("g").attr("id","xAxis").attr("transform","translate(0," + (height - margin.bottom) + ")");
     svg.append("g").attr("id","yAxis").attr("transform","translate(" + (margin.left) + ",0)");
-    
+
     return svg;
-}		  		  		  
+}
 
 //
 var svg = init();
