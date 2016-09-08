@@ -1,22 +1,20 @@
 function piechart(probabilities, colors) {
-  var dataset = probabilities;
   var lastAngle = 0;
-  var arcs = [];
-  d3.select("svg").selectAll("path").exit().remove();
-
-  for(data in dataset) {
-    var newLast = (Math.PI * (dataset[data] * 3.6)) / 180;
-    var arc = d3.arc()
-      .innerRadius(40)
-      .outerRadius(60)
-      .startAngle(lastAngle)
-      .endAngle(lastAngle + newLast);
+  d3.select("g").selectAll("path").exit().remove();
+  var angles = []
+  for(data in probabilities) {
+    var newLast = (Math.PI * (probabilities[data]*100 * 3.6)) / 180;
+    angles[data] = {startAngle: lastAngle, endAngle: lastAngle + newLast};
     lastAngle = lastAngle + newLast;
-    arcs.push(arc);
   }
-  d3.select("svg").selectAll("path").data(arcs).enter()
+
+  var arc = d3.arc()
+    .innerRadius(0)
+    .outerRadius(100);
+
+  d3.select("g").selectAll("path").data(angles).enter()
   .append("path")
-  .attr("d", function(d) { return d(); })
+  .attr("d", function(d) { return arc(d); })
   .attr("fill", function(d, i) {
     return colors[i];
   })

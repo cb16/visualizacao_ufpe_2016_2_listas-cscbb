@@ -8,6 +8,7 @@ var generator  = d3.randomUniform(0, 1);
 var colorScale = colorbrewer.Paired[12];
 //
 var dataset = [];
+var angles = [];
 
 function updateDataset(){
 
@@ -22,22 +23,20 @@ function updateDataset(){
 function pieChart(probabilities, colors){
     //Codigo do problema 1
     var lastAngle = 0;
-    var arcs = [];
     d3.select("g").selectAll("path").exit().remove();
-
     for(data in probabilities) {
       var newLast = (Math.PI * (probabilities[data]*100 * 3.6)) / 180;
-      var arc = d3.arc()
-        .innerRadius(0)
-        .outerRadius(100)
-        .startAngle(lastAngle)
-        .endAngle(lastAngle + newLast);
+      angles[data] = {startAngle: lastAngle, endAngle: lastAngle + newLast};
       lastAngle = lastAngle + newLast;
-      arcs.push(arc());
     }
-    d3.select("g").selectAll("path").data(arcs).enter()
+
+    var arc = d3.arc()
+      .innerRadius(0)
+      .outerRadius(100);
+
+    d3.select("g").selectAll("path").data(angles).enter()
     .append("path")
-    .attr("d", function(d) { return d; })
+    .attr("d", function(d) { return arc(d); })
     .attr("fill", function(d, i) {
       return colors[i];
     })
@@ -50,33 +49,33 @@ function renderDataset(){
     //em algum momento voce provavelmente vai querer chamar algo como:
     //                                      pieChart(dataset,colorScale.slice(0,5))
     pieChart(dataset, colorScale.slice(0,5));
+    //console.log("h");
     var colors = colorScale.slice(0,5);
     var lastAngle = 0;
     var arcs = [];
+
+    var arc = d3.arc()
+      .innerRadius(0)
+      .outerRadius(100);
+
     d3.select("g").selectAll("path").exit().remove();
 
-    for(data in dataset) {
-      var newLast = (Math.PI * (dataset[data]*100 * 3.6)) / 180;
-      var arc = d3.arc()
-        .innerRadius(0)
-        .outerRadius(100)
-        .startAngle(lastAngle)
-        .endAngle(lastAngle + newLast);
-      lastAngle = lastAngle + newLast;
-      arcs.push(arc());
-    }
-
-    d3.select("g").selectAll("path").data(arcs)
+    d3.select("g").selectAll("path").data(angles)
     .transition()
     .duration(1000)
     .attr("class", "arc")
-    .attr("d", function(d) { return d; })
+    .attrTween("d", function(d) {
+      var interpolate = d3.interpolate(this._current, d);
+      this._current = interpolate(0);
+      return function(t) {
+        return arc(interpolate(t));
+      }
+    })
     .attr("fill", function(d, i) {
       return colors[i];
     })
     .attr("transform", "translate(100,100)");
 }
-
 
 function init(){
     //create clickable paragraph
