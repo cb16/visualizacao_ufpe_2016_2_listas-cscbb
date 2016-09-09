@@ -1,10 +1,3 @@
-/*
-CONSIDERAÇÕES:
-  O retângulo não aparece... ou seja o usuário faz o movimento,
-  mas não está vendo o retângulo.
-  O que é usado é o ponto inicial no mousedown e o ponto final no mouseup.
-*/
-
 //Width and height
 var margin = {top: 10, right: 20, bottom: 10, left: 20};
 var width = 900 - margin.left - margin.right;
@@ -179,18 +172,16 @@ function init(){
 
       if(!s.empty()) {
           p2 = d3.mouse( this),
-
-              d = {
-                  x       : parseInt( s.attr( "x"), 10),
-                  y       : parseInt( s.attr( "y"), 10),
-                  width   : parseInt( s.attr( "width"), 10),
-                  height  : parseInt( s.attr( "height"), 10)
-              },
-              move = {
-                  x : p2[0] - d.x,
-                  y : p2[1] - d.y
-              }
-          ;
+          d = {
+              x       : parseInt( s.attr( "x"), 10),
+              y       : parseInt( s.attr( "y"), 10),
+              width   : parseInt( s.attr( "width"), 10),
+              height  : parseInt( s.attr( "height"), 10)
+          },
+          move = {
+              x : p2[0] - d.x,
+              y : p2[1] - d.y
+          };
 
           if( move.x < 1 || (move.x*2<d.width)) {
               d.x = p2[0];
@@ -206,7 +197,14 @@ function init(){
               d.height = move.y;
           }
 
-          s.attr(d);
+          s
+          .attr("x", d.x)
+          .attr("y", d.y)
+          .attr("width", d.width)
+          .attr("height", d.height)
+          .attr("stroke", "gray")
+          .attr("stroke-width", 2)
+          .attr("fill-opacity", 0.0);
           //console.log( d);
       }
   })
