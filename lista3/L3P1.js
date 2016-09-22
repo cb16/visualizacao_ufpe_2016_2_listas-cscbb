@@ -5,6 +5,7 @@ var checked;
 var p = [];
 var p2 = [];
 var rightMouse;
+var scaleFactor = 1;
 
 var allAccidents = [];
 var allBairros = [];
@@ -77,65 +78,56 @@ var chooseColor = function(type) {
 };
 
 function render() {
-  d3.json("bairros.geojson", function(bairros) {
-    d3.json("acidentes-2014-11-novembro.geojson", function(acidentes) {
-      allAccidents = acidentes.features;
-      allBairros = bairros.features;
-      b = bairros;
-      a = acidentes;
-      var center = d3.geoCentroid(bairros);
-      var offset = [width/2, height/2]
-      var scale = 150000;
-      var projection = d3.geoMercator().scale(scale).center(center).translate(offset);
+  var center = d3.geoCentroid(b);
+  var offset = [width/2, height/2]
+  var scale = 150000;
+  var projection = d3.geoMercator().scale(scale).center(center).translate(offset);
 
-      var path = d3.geoPath().projection(projection);
+  var path = d3.geoPath().projection(projection);
 
-      var bounds  = path.bounds(bairros);
-      var hscale  = scale*width  / (bounds[1][0] - bounds[0][0]);
-      var vscale  = scale*height / (bounds[1][1] - bounds[0][1]);
-      scale   = (hscale < vscale) ? hscale : vscale;
-      offset  = [width - (bounds[0][0] + bounds[1][0])/2,
-                        height - (bounds[0][1] + bounds[1][1])/2];
+  var bounds  = path.bounds(b);
+  var hscale  = scale*width  / (bounds[1][0] - bounds[0][0]);
+  var vscale  = scale*height / (bounds[1][1] - bounds[0][1]);
+  scale   = (hscale < vscale) ? hscale : vscale;
+  offset  = [width - (bounds[0][0] + bounds[1][0])/2,
+                    height - (bounds[0][1] + bounds[1][1])/2];
 
-      projection = d3.geoMercator().center(center)
-        .scale(scale).translate(offset);
-      path = path.projection(projection);
+  projection = d3.geoMercator().center(center)
+    .scale(scale).translate(offset);
+  path = path.projection(projection);
 
-      svg.selectAll("path")
-        .data(bairros.features)
-        .enter()
-        .append("path")
-        .attr("d", path)
-        .attr("fill", "white")
-        .attr("stroke", "black")
-        .attr("stroke-width", "1");
+  svg.selectAll("path")
+    .data(allBairros)
+    .enter()
+    .append("path")
+    .attr("d", path)
+    .attr("fill", "white")
+    .attr("stroke", "black")
+    .attr("stroke-width", "1");
 
-      svg.selectAll("circle")
-      .remove();
+  svg.selectAll("circle")
+  .remove();
 
-      svg.selectAll("circle")
-        .data(acidentes.features)
-        .enter()
-        .append("circle")
-        .attr("cx", function(d) {
-          return projection(d.geometry.coordinates)[0];
-        })
-        .attr("cy", function(d) {
-          return projection(d.geometry.coordinates)[1];
-        })
-        .attr("r", "3px")
-        .attr("fill", function(d){
-          if(checked == true) {
-            return chooseColor(d.properties.tipo);
-          } else {
-            return "deeppink";
-          }
-        })
-        .attr("stroke", "black")
-        .attr("stroke-width", "1");
-    });
-
-  });
+  svg.selectAll("circle")
+    .data(allAccidents)
+    .enter()
+    .append("circle")
+    .attr("cx", function(d) {
+      return projection(d.geometry.coordinates)[0];
+    })
+    .attr("cy", function(d) {
+      return projection(d.geometry.coordinates)[1];
+    })
+    .attr("r", "3px")
+    .attr("fill", function(d){
+      if(checked == true) {
+        return chooseColor(d.properties.tipo);
+      } else {
+        return "deeppink";
+      }
+    })
+    .attr("stroke", "black")
+    .attr("stroke-width", "1");
 }
 
 function checkChanged() {
@@ -143,10 +135,7 @@ function checkChanged() {
   render();
 }
 
-function init() {
-  checked = false;
-  render();
-
+function mouseFunctions() {
   d3.select("svg").on("mousemove", function() {
     if(rightMouse) {
       var s = svg.select("rect");
@@ -223,6 +212,34 @@ function init() {
     .attr("y", p[1])
     .attr("width", 0)
     .attr("height", 0);
+  })
+  .on("wheel.zoom",function(d){
+	    d3.event.stopPropagation();
+	    d3.event.preventDefault();
+	    if(d3.event.wheelDeltaY > 0)
+    		scaleFactor *= 1.1;
+    	else
+    		scaleFactor *= 0.9;
+    	renderDataset();
+	});
+}
+
+function readFiles() {
+  d3.json("bairros.geojson", function(bairros) {
+    d3.json("acidentes-2014-11-novembro.geojson", function(acidentes) {
+      allAccidents = acidentes.features;
+      allBairros = bairros.features;
+      b = bairros;
+      a = acidentes;
+      render();
+    });
   });
+}
+
+function init() {
+  checked = false;
+  readFiles();
+  render();
+  mouseFunctions();
 
 }
