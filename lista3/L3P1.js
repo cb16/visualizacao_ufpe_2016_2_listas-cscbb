@@ -11,6 +11,8 @@ var state = "idle";
 var full = [];
 var scale = 150000;
 
+var states = {"Automóveis e outros": true, "Ciclistas": true, "Ciclomotores": true, "Motocicletas": true, "Pedestres": true};
+
 var initialMousePosition = [];
 
 var allAccidents = [];
@@ -66,10 +68,19 @@ function updateHistogram(selected) {
   .attr("width", 20)
   .attr("y", 0)
   .attr("fill", function(d) {
-    if(checked)
-      return chooseColor(d[0]);
-    else
-      return "deeppink";
+    if(states[d[0]]) {
+      if(checked)
+        return chooseColor(d[0]);
+      else
+        return "deeppink";
+    } else {
+      return "gray";
+    }
+  })
+  .on("click", function(d) {
+    states[d[0]] = (states[d[0]] ? false : true);
+    render();
+    updateHistogram(selected);
   });
 
   g.selectAll("text").data(selected).enter()
@@ -89,10 +100,14 @@ function updateHistogram(selected) {
   .attr("width", 20)
   .attr("y", 0)
   .attr("fill", function(d) {
-    if(checked)
-      return chooseColor(d[0]);
-    else
-      return "deeppink";
+    if(states[d[0]]) {
+      if(checked)
+        return chooseColor(d[0]);
+      else
+        return "deeppink";
+    } else {
+      return "gray";
+    }
   });
 
   g.selectAll("text").data(selected)
@@ -128,7 +143,17 @@ function showDetails() {
 
   for(accident in info) {
     var proj = projection([info[accident]["longitude"], info[accident]["latitude"]]);
-    if(inside(proj[0], proj[1])) {
+
+    /*
+    OBSERVAÇÃO: Apenas considera como selecionado se o tipo de acidente estiver selecionado
+    (considerando o checkbox da segunda questão).
+    Ou seja, se não estiver e o cara selecionar um quadrado com dois acidentes
+    e um desses acidentes for de um tipo que não está selecionado,
+    ele só "verá" um acidente.
+    Para desconsiderar isso, basta tirar a segunda condição do if abaixo
+    */
+
+    if(inside(proj[0], proj[1]) && states[info[accident]["tipo"]]) {
       selected[info[accident]["tipo"]] = 1 + selected[info[accident]["tipo"]];
     }
   }
@@ -202,10 +227,13 @@ function render() {
     })
     .attr("r", "3px")
     .attr("fill", function(d){
-      if(checked == true) {
-        return chooseColor(d.properties.tipo);
+      if(states[d.properties.tipo]) {
+        if(checked)
+          return chooseColor(d.properties.tipo);
+        else
+          return "deeppink";
       } else {
-        return "deeppink";
+        return "gray";
       }
     })
     .attr("stroke", "black")
