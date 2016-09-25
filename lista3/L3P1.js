@@ -69,22 +69,17 @@ function generateMonthly() {
 
 function timeTable() {
   var g = d3.select("#time").select("g");
+  var h = d3.select("#time");
 
-  g.append("rect")
-  .attr("x", 0)
-  .attr("y", 0)
-  .attr("height", 500)
-  .attr("width", 500)
-  .attr("fill-opacity", 0)
-  .attr("stroke", "black")
-  .attr("stroke-width", 5);
+  var dateFormat = d3.timeFormat("%b-%y");
+  var dates = ["03/2014","04/2014","05/2014","06/2014","07/2014","08/2014","09/2014","10/2014","11/2014","12/2014"];
 
   var offset = 5;
   var maxi = 0;
   var list = [];
   for(id in byType) {
     var t = [];
-    var start = 5;
+    var start = 0;
     for(it in byType[id]) {
       t.push({x: start, y: byType[id][it] + offset});
       start += 50;
@@ -93,7 +88,18 @@ function timeTable() {
     list.push(t);
   }
 
-  var scaleY = d3.scaleLinear().domain([5, maxi]).range([3, 450]);
+  var scaleY = d3.scaleLinear().domain([5, maxi]).range([0, 450]);
+  var scaleX = d3.scaleLinear().domain(["03/2014","12/2014"]).range([0,490]);
+
+  var xAxis = d3.axisLeft(scaleY);
+  g.append("g")
+  .attr("class", "y axis")
+  .call(xAxis);
+
+  var yAxis = d3.axisBottom(scaleX);
+  g.append("g")
+  .attr("class", "x axis")
+  .call(yAxis);
 
   var lineFunction = d3.line()
   .x(function(d) { return d.x; })
@@ -153,7 +159,7 @@ function updateHistogram(selected) {
   .attr("y", 0)
   .attr("height", 500)
   .attr("width", 500)
-  .attr("fill-opacity", 0)
+  .attr("fill", "none")
   .attr("stroke", "black")
   .attr("stroke-width", 5);
 
