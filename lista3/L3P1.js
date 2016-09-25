@@ -1,11 +1,17 @@
-var svg = d3.select("svg").select("g");
+var svg = d3.select("#map").select("g");
 var width = 600;
 var height = 600;
 var checked;
 var p = [];
 var p2 = [];
 var rightMouse;
-var scaleFactor = 1;
+
+var state = "idle";
+
+var full = [];
+var scale = 150000;
+
+var initialMousePosition = [];
 
 var allAccidents = [];
 var allBairros = [];
@@ -34,12 +40,75 @@ function inside(x,y) {
   return true;
 }
 
+function makeFull() {
+  var info = allAccidents.map(e => e.properties);
+  var helper = {"Automóveis e outros": 0, "Ciclistas": 0, "Ciclomotores": 0, "Motocicletas": 0, "Pedestres": 0};
+
+  for(accident in info) {
+    helper[info[accident]["tipo"]] = 1 + helper[info[accident]["tipo"]];
+  }
+
+  for(i in helper) {
+    full.push([i, helper[i]]);
+  }
+}
+
+function updateHistogram(selected) {
+  var h = d3.select("#histogram").select("g");
+  var g = d3.select("#histogram");
+
+  h.selectAll("rect").data(selected).enter()
+  .append("rect")
+  .attr("x", function(d,i) {
+    return i * (500/selected.length);
+  })
+  .attr("height", function(d){return d[1] * 5;})
+  .attr("width", 20)
+  .attr("y", 0)
+  .attr("fill", function(d) {
+    if(checked)
+      return chooseColor(d[0]);
+    else
+      return "deeppink";
+  });
+
+  g.selectAll("text").data(selected).enter()
+  .append("text")
+  .attr("x", function(d,i) {
+    return (i * (500/selected.length));
+  })
+  .attr("y", function(d){return 500 - (d[1] * 5)/2;})
+  .text(function(d) { return d[0]; });
+
+  h.selectAll("rect").data(selected)
+  .transition()
+  .attr("x", function(d,i) {
+    return i * (500/selected.length);
+  })
+  .attr("height", function(d){return d[1] * 5;})
+  .attr("width", 20)
+  .attr("y", 0)
+  .attr("fill", function(d) {
+    if(checked)
+      return chooseColor(d[0]);
+    else
+      return "deeppink";
+  });
+
+  g.selectAll("text").data(selected)
+  .transition()
+  .attr("x", function(d,i) {
+    return (i * (500/selected.length));
+  })
+  .attr("y", function(d){return 500 - (d[1] * 5)/2;})
+  .text(function(d) { return d[0]; });
+}
+
 function showDetails() {
   var selected = {"Automóveis e outros": 0, "Ciclistas": 0, "Ciclomotores": 0, "Motocicletas": 0, "Pedestres": 0};
 
   var center = d3.geoCentroid(b);
   var offset = [width/2, height/2]
-  var scale = 150000;
   var projection = d3.geoMercator().scale(scale).center(center).translate(offset);
 
   var path = d3.geoPath().projection(projection);
@@ -64,23 +133,36 @@ function showDetails() {
     }
   }
 
+  var counter = 0;
+
   console.log("ACCIDENTS IN SELECTION");
   for(i in selected) {
+    counter += selected[i];
     console.log(i + " -> " + selected[i]);
   }
+
+  if(counter > 0) {
+    var helper = [];
+    for(i in selected) {
+      helper.push([i, selected[i]]);
+    }
+    updateHistogram(helper);
+  }
+  else
+    updateHistogram(full);
 
 }
 
 var colors = {"Automóveis e outros": 4, "Motocicletas": 3, "Ciclomotores": 2, "Ciclistas": 1, "Pedestres": 0};
 var chooseColor = function(type) {
-  var scale = d3.scaleLinear().domain([0,4]).range(["yellow", "red"]);
-  return scale(colors[type]);
+  var scaleColor = d3.scaleLinear().domain([0,4]).range(["yellow", "red"]);
+  return scaleColor(colors[type]);
 };
 
 function render() {
   var center = d3.geoCentroid(b);
   var offset = [width/2, height/2]
-  var scale = 150000;
+  scale = 150000;
   var projection = d3.geoMercator().scale(scale).center(center).translate(offset);
 
   var path = d3.geoPath().projection(projection);
@@ -132,12 +214,21 @@ function render() {
 
 function checkChanged() {
   checked = (checked ? false : true);
+  updateHistogram(full);
   render();
 }
 
 function mouseFunctions() {
-  d3.select("svg").on("mousemove", function() {
+  d3.select("#map").on("mousedown", function() {
+    d3.event.stopPropagation();
+    d3.event.preventDefault();
+    initialMousePosition = d3.mouse(this);
+
+  })
+  .on("mousemove", function() {
     if(rightMouse) {
+      d3.event.stopPropagation();
+      d3.event.preventDefault();
       var s = svg.select("rect");
 
       if(!s.empty()) {
@@ -179,6 +270,8 @@ function mouseFunctions() {
   })
   .on("mouseup", function(e) {
     if(rightMouse) {
+      d3.event.stopPropagation();
+      d3.event.preventDefault();
       var s = svg.select("rect");
       var d = {
           x       : parseInt( s.attr( "x"), 10),
@@ -216,11 +309,11 @@ function mouseFunctions() {
   .on("wheel.zoom",function(d){
 	    d3.event.stopPropagation();
 	    d3.event.preventDefault();
-	    if(d3.event.wheelDeltaY > 0)
-    		scaleFactor *= 1.1;
+	    /*if(d3.event.wheelDeltaY > 0)
+    		scale *= 1.1;
     	else
-    		scaleFactor *= 0.9;
-    	renderDataset();
+    		scale *= 0.9;*/
+    	//render();
 	});
 }
 
@@ -231,7 +324,9 @@ function readFiles() {
       allBairros = bairros.features;
       b = bairros;
       a = acidentes;
+      makeFull();
       render();
+      updateHistogram(full);
     });
   });
 }
@@ -239,7 +334,6 @@ function readFiles() {
 function init() {
   checked = false;
   readFiles();
-  render();
   mouseFunctions();
 
 }
