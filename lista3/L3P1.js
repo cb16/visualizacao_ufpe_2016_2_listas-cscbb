@@ -13,6 +13,8 @@ var scale = 150000;
 
 var states = {"Automóveis e outros": true, "Ciclistas": true, "Ciclomotores": true, "Motocicletas": true, "Pedestres": true};
 
+var scaleColor2 = d3.scaleLinear().domain([0,7]).range(["yellow", "red"]);
+
 var monthly = [];
 var all = [];
 var byType = [];
@@ -53,7 +55,7 @@ function generateMonthly() {
 
       //if(tipo == "ERRO") console.log("erro: " + item[each].properties.tipo);
       //else console.log("tipo " + tipo);
-      
+
       byType[tipo][it] += 1;
 
       if(tipo in monthly[it]) {
@@ -66,6 +68,44 @@ function generateMonthly() {
 }
 
 function timeTable() {
+  var g = d3.select("#time").select("g");
+
+  g.append("rect")
+  .attr("x", 0)
+  .attr("y", 0)
+  .attr("height", 500)
+  .attr("width", 500)
+  .attr("fill-opacity", 0)
+  .attr("stroke", "black")
+  .attr("stroke-width", 5);
+
+  var offset = 5;
+  var maxi = 0;
+  var list = [];
+  for(id in byType) {
+    var t = [];
+    var start = 5;
+    for(it in byType[id]) {
+      t.push({x: start, y: byType[id][it] + offset});
+      start += 50;
+      maxi = Math.max(maxi, byType[id][it])
+    }
+    list.push(t);
+  }
+
+  var scaleY = d3.scaleLinear().domain([5, maxi]).range([3, 450]);
+
+  var lineFunction = d3.line()
+  .x(function(d) { return d.x; })
+  .y(function(d) { return scaleY(d.y); });
+
+  g.selectAll("path").data(list).enter()
+  .append("path")
+  .attr("class", "line")
+  .attr("d", function(d) { return lineFunction(d); })
+  .attr("stroke", function(d,i) { return scaleColor2(i); })
+  .attr("stroke-width", 2)
+  .attr("fill", "none");
 
 }
 
@@ -108,10 +148,19 @@ function updateHistogram(selected) {
   var h = d3.select("#histogram").select("g");
   var g = d3.select("#histogram");
 
+  g.append("rect")
+  .attr("x", 0)
+  .attr("y", 0)
+  .attr("height", 500)
+  .attr("width", 500)
+  .attr("fill-opacity", 0)
+  .attr("stroke", "black")
+  .attr("stroke-width", 5);
+
   h.selectAll("rect").data(selected).enter()
   .append("rect")
   .attr("x", function(d,i) {
-    return i * (500/selected.length);
+    return i * (500/selected.length) + 20;
   })
   .attr("height", function(d){return d[1] * 5;})
   .attr("width", 20)
@@ -135,7 +184,7 @@ function updateHistogram(selected) {
   g.selectAll("text").data(selected).enter()
   .append("text")
   .attr("x", function(d,i) {
-    return (i * (500/selected.length));
+    return (i * (500/selected.length)) + 20;
   })
   .attr("y", function(d){return 500 - (d[1] * 5)/2;})
   .text(function(d) { return d[0]; });
@@ -143,7 +192,7 @@ function updateHistogram(selected) {
   h.selectAll("rect").data(selected)
   .transition()
   .attr("x", function(d,i) {
-    return i * (500/selected.length);
+    return i * (500/selected.length) + 20;
   })
   .attr("height", function(d){return d[1] * 5;})
   .attr("width", 20)
@@ -162,7 +211,7 @@ function updateHistogram(selected) {
   g.selectAll("text").data(selected)
   .transition()
   .attr("x", function(d,i) {
-    return (i * (500/selected.length));
+    return (i * (500/selected.length)) + 20;
   })
   .attr("y", function(d){return 500 - (d[1] * 5)/2;})
   .text(function(d) { return d[0]; });
@@ -428,6 +477,7 @@ function readFiles() {
                     d3.json("acidentes-2014-dezembro.geojson", function(dezembro) {
                       all.push(dezembro);
                       generateMonthly();
+                      timeTable();
                     });
                   });
                 });
