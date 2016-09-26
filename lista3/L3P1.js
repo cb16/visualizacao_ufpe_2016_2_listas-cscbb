@@ -71,7 +71,7 @@ function timeTable() {
   var g = d3.select("#time").select("g");
   var h = d3.select("#time");
 
-  var dateFormat = d3.timeFormat("%b-%y");
+  var dateFormat = d3.timeFormat("%b/%y");
   var dates = ["03/2014","04/2014","05/2014","06/2014","07/2014","08/2014","09/2014","10/2014","11/2014","12/2014"];
 
   var offset = 5;
@@ -89,7 +89,7 @@ function timeTable() {
   }
 
   var scaleY = d3.scaleLinear().domain([5, maxi]).range([0, 450]);
-  var scaleX = d3.scaleLinear().domain(["03/2014","12/2014"]).range([0,490]);
+  var scaleX = d3.scaleLinear().domain([dateFormat("03/2014"),dateFormat("12/2014")]).range([0,490]);
 
   var xAxis = d3.axisLeft(scaleY);
   g.append("g")
@@ -151,26 +151,23 @@ function makeFull() {
 }
 
 function updateHistogram(selected) {
-  var h = d3.select("#histogram").select("g");
-  var g = d3.select("#histogram");
+  var h = d3.select("#hist").select("#histogram");
+  var g = d3.select("#hist");
+  var offset = 10;
 
-  g.append("rect")
-  .attr("x", 0)
-  .attr("y", 0)
-  .attr("height", 500)
-  .attr("width", 500)
-  .attr("fill", "none")
-  .attr("stroke", "black")
-  .attr("stroke-width", 5);
+  var maxOfList = d3.max(selected, function(d) { return d[1]; });
+  var yScale = d3.scaleLinear().domain([maxOfList,0]).range([450,0]);
+  var yScaleReverted = d3.scaleLinear().domain([maxOfList,0]).range([0,450]);
+  var yaxis = d3.axisRight(yScaleReverted);
 
   h.selectAll("rect").data(selected).enter()
   .append("rect")
   .attr("x", function(d,i) {
     return i * (500/selected.length) + 20;
   })
-  .attr("height", function(d){return d[1] * 5;})
+  .attr("height", function(d){ return yScale(d[1]);})
   .attr("width", 20)
-  .attr("y", 0)
+  .attr("y", 10)
   .attr("fill", function(d) {
     if(states[d[0]]) {
       if(checked)
@@ -181,6 +178,7 @@ function updateHistogram(selected) {
       return "gray";
     }
   })
+  .attr("transform", "translate(20, 0)")
   .on("click", function(d) {
     states[d[0]] = (states[d[0]] ? false : true);
     render();
@@ -192,17 +190,20 @@ function updateHistogram(selected) {
   .attr("x", function(d,i) {
     return (i * (500/selected.length)) + 20;
   })
-  .attr("y", function(d){return 500 - (d[1] * 5)/2;})
+  .attr("y", function(d){ return 500 - offset - yScale(d[1])/2;})
   .text(function(d) { return d[0]; });
+
+
+  //TRANSITIONS
 
   h.selectAll("rect").data(selected)
   .transition()
   .attr("x", function(d,i) {
     return i * (500/selected.length) + 20;
   })
-  .attr("height", function(d){return d[1] * 5;})
+  .attr("height", function(d){return yScale(d[1]);})
   .attr("width", 20)
-  .attr("y", 0)
+  .attr("y", 10)
   .attr("fill", function(d) {
     if(states[d[0]]) {
       if(checked)
@@ -219,8 +220,17 @@ function updateHistogram(selected) {
   .attr("x", function(d,i) {
     return (i * (500/selected.length)) + 20;
   })
-  .attr("y", function(d){return 500 - (d[1] * 5)/2;})
+  .attr("y", function(d){return 500 - offset - yScale(d[1])/2;})
   .text(function(d) { return d[0]; });
+
+  g.append("g")
+  .attr("id", "axis")
+  .attr("width", 500)
+  .attr("height", 500)
+  .attr("transform", "translate(10,40)");
+
+  g.select("#axis")
+  .call(yaxis);
 }
 
 function showDetails() {
