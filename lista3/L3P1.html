@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
   <head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-		<title>L3P1</title>
+		<title>Lista 3</title>
 		<script src="https://d3js.org/d3.v4.min.js"></script>
 		<style type="text/css">
 		</style>
@@ -15,6 +15,18 @@
     <svg width="500" height="500" id="hist"><g id="histogram" transform="translate(0,500) scale(1,-1)"></g></svg>
     </br>
     <svg width="500" height="500" id="time"><g  transform="translate(0,500) scale(1,-1)"></g></svg>
+    <div id="checkboxes">
+      <input type="checkbox" name="march" id="march" checked onClick="monthSelection(march.name, march.checked)">Março - 2014</input>
+      <input type="checkbox" name="april" id="april" checked onClick="monthSelection(april.name, april.checked)">Abril - 2014</input>
+      <input type="checkbox" name="may" id="may" checked onClick="monthSelection(may.name, may.checked)">Maio - 2014</input>
+      <input type="checkbox" name="june" id="june" checked onClick="monthSelection(june.name, june.checked)">Junho - 2014</input>
+      <input type="checkbox" name="july" id="july" checked onClick="monthSelection(july.name, july.checked)">Julho - 2014</input>
+      <input type="checkbox" name="august" id="august" checked onClick="monthSelection(august.name, august.checked)">Agosto - 2014</input>
+      <input type="checkbox" name="september" id="september" checked onClick="monthSelection(september.name, september.checked)">Setembro - 2014</input>
+      <input type="checkbox" name="october" id="october" checked onClick="monthSelection(october.name, october.checked)">Outubro - 2014</input>
+      <input type="checkbox" name="november" id="november" checked onClick="monthSelection(november.name, november.checked)">Novembro - 2014</input>
+      <input type="checkbox" name="december" id="december" checked onClick="monthSelection(december.name, december.checked)">Dezembro - 2014</input>
+    </div>
 
     <script src="L3P1.js"></script>
     <script src="L3P2.js"></script>

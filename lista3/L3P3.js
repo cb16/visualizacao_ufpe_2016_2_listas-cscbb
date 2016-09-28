@@ -1,7 +1,21 @@
+var months = [true, true, true, true, true, true, true, true, true, true];
+var monthToIndex = {"march":0, "april":1, "may":2, "june":3, "july":4, "august":5,
+  "september":6, "october":7, "november":8, "december":9};
+
+function monthSelection(name, value) {
+  //console.log(name + " " + value);
+  months[monthToIndex[name]] = value;
+  timeTable();
+}
 
 function timeTable() {
   var g = d3.select("#time").select("g");
   var h = d3.select("#time");
+
+  //clearing
+  h.select("#firstAxis").remove();
+  h.select("#secondAxis").remove();
+  g.selectAll("path").remove();
 
   var margin = 20;
 
@@ -10,6 +24,12 @@ function timeTable() {
 
   var keys = [];
 
+  var ys = 0;
+  for(it in months) {
+    if(months[it])
+      ys += 1;
+  }
+
   var maxi = 0;
   var list = [];
   for(id in byType) {
@@ -17,26 +37,30 @@ function timeTable() {
     var start = 0;
     keys.push(id);
     for(it in byType[id]) {
-      t.push({x: start, y: byType[id][it] + margin});
-      start += 50;
-      maxi = Math.max(maxi, byType[id][it])
+      if(months[it]) {
+        t.push({x: start, y: byType[id][it] + margin});
+        start += 50;
+        maxi = Math.max(maxi, byType[id][it])
+      }
     }
     list.push(t);
   }
-  console.log(byType);
+  //console.log(byType);
 
   var scaleY = d3.scaleLinear().domain([0, maxi]).range([0, 400]);
   var scaleYReverted = d3.scaleLinear().domain([0, maxi]).range([400, 0]);
-  var scaleX = d3.scaleLinear().domain([0,10]).range([0,400]);
+  var scaleX = d3.scaleLinear().domain([0,ys]).range([0,400]);
 
-  var xAxis = d3.axisLeft(scaleYReverted);
+  var xAxis = d3.axisRight(scaleYReverted);
   h.append("g")
   .attr("transform", "translate(20, 30)")
+  .attr("id", "firstAxis")
   .call(xAxis);
 
   var yAxis = d3.axisBottom(scaleX);
   h.append("g")
   .attr("transform", "translate(20,435)")
+  .attr("id", "secondAxis")
   .call(yAxis);
 
   var lineFunction = d3.line()
