@@ -1,0 +1,19 @@
+Problema 1
+  Não foram implementadas as funções: pan e zoom.
+
+Problema 2
+  -O histograma é atualizado quando ocorre uma seleção no mapa
+  -é possível selecionar a checkbox para fazer ou desfazer a seleção daquele grupo de dados.
+    Porém é importante notar que: como quando uma categoria deixa de ser selecionada e é feita uma seleção no mapa,
+    como está ignorando essa categoria, o histograma vai ficar com 0 caras selecionados dessa categoria,
+    a barra dessa categoria no histograma vai sumir, o que fará ser impossível de seleciona-lo novamente.
+    Para mudar esse comportamento, basta mudar a linha 35 do arquivo L3P1 de
+      if(inside(proj[0], proj[1]) && states[info[accident]["tipo"]])
+    para
+      if(inside(proj[0], proj[1]))
+
+Problema 3
+  -Foi feito um gráfico de linhas mostrando quantidade x mês de cada categoria
+  -É possível passar o mouse por cima da linha para ver a qual categoria de refere.
+  -função parseType para agrupar os tipos de acidentes, pois havia uma grande divergencia nos dados
+  -É possível fazer seleção dos meses que serão mostrados no gráfico de linhas
