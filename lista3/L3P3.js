@@ -25,10 +25,15 @@ function timeTable() {
   var keys = [];
 
   var ys = 0;
+  var ticks = [];
+
   for(it in months) {
-    if(months[it])
+    if(months[it]) {
       ys += 1;
+      ticks.push(dates[it]);
+    }
   }
+
 
   var maxi = 0;
   var list = [];
@@ -40,7 +45,8 @@ function timeTable() {
     keys.push(id);
     for(it in byType[id]) {
       if(months[it]) {
-        t.push({x: start, y: byType[id][it] + margin});
+        //t.push({x: start, y: byType[id][it] + margin});
+        t.push({x: dates[it], y: byType[id][it] + margin});
         start += 50;
         maxi = Math.max(maxi, byType[id][it])
       }
@@ -51,7 +57,8 @@ function timeTable() {
 
   var scaleY = d3.scaleLinear().domain([0, maxi]).range([0, 400]);
   var scaleYReverted = d3.scaleLinear().domain([0, maxi]).range([400, 0]);
-  var scaleX = d3.scaleLinear().domain([0,ys-1]).range([0,400]);
+  var scaleX = d3.scalePoint().domain(ticks).range([0,400]);
+  var scaleXX = d3.scaleLinear().domain([0,ys-1]).range([0,400]);
 
   var xAxis = d3.axisRight(scaleYReverted);
   h.append("g")
@@ -60,13 +67,14 @@ function timeTable() {
   .call(xAxis);
 
   var yAxis = d3.axisBottom(scaleX);
+
   h.append("g")
   .attr("transform", "translate(20,435)")
   .attr("id", "secondAxis")
   .call(yAxis);
 
   var lineFunction = d3.line()
-  .x(function(d, i) { return scaleX(i) + margin; })
+  .x(function(d) { return scaleX(d.x) + margin; })
   .y(function(d) { return scaleY(d.y) + margin; });
 
   g.selectAll("path").data(list).enter()
