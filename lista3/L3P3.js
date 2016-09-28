@@ -32,9 +32,11 @@ function timeTable() {
 
   var maxi = 0;
   var list = [];
+  var start;
+
   for(id in byType) {
     var t = [];
-    var start = 0;
+    start = 0;
     keys.push(id);
     for(it in byType[id]) {
       if(months[it]) {
@@ -49,7 +51,7 @@ function timeTable() {
 
   var scaleY = d3.scaleLinear().domain([0, maxi]).range([0, 400]);
   var scaleYReverted = d3.scaleLinear().domain([0, maxi]).range([400, 0]);
-  var scaleX = d3.scaleLinear().domain([0,ys]).range([0,400]);
+  var scaleX = d3.scaleLinear().domain([0,ys-1]).range([0,400]);
 
   var xAxis = d3.axisRight(scaleYReverted);
   h.append("g")
@@ -64,7 +66,7 @@ function timeTable() {
   .call(yAxis);
 
   var lineFunction = d3.line()
-  .x(function(d) { return d.x + margin; })
+  .x(function(d, i) { return scaleX(i) + margin; })
   .y(function(d) { return scaleY(d.y) + margin; });
 
   g.selectAll("path").data(list).enter()
@@ -77,12 +79,13 @@ function timeTable() {
   .on("mouseover", function(d,i) {
     var position = d3.mouse(this);
     h.append("text")
+    .attr("id", "subtitle")
     .attr("x", position[0])
     .attr("y", 500 - position[1])
     .text(keys[i]);
   })
   .on("mouseout", function() {
-    h.selectAll("text").remove();
+    h.selectAll("#subtitle").remove();
   });
 
 }
