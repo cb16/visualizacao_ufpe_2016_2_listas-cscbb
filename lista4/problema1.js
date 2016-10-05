@@ -52,10 +52,11 @@ function plotbox(list) {
   	maxData = Math.max(maxData, list[it].maximum);
 		minData = Math.min(minData, list[it].minimum);
 	}
-	console.log(maxData + " " + minData);
 
 	//clear all
 	d3.select("#axis").remove();
+  s.selectAll("line").remove();
+  s.selectAll("rect").remove();
 
 	//start plot
 
@@ -142,7 +143,7 @@ function plotbox(list) {
 
 
 function makeData(info) {
-	var sorted = info.sort();
+	var sorted = info.sort(function(a,b) { return a - b});
 	var size = sorted.length;
 	var median;
 	if((size/2)%2)
