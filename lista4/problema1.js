@@ -47,14 +47,14 @@ function plotbox(list) {
 	x = 50;
   maxData = 0;
   minData = 1000000;
-
-	for(var it in list) {
-  	maxData = Math.max(maxData, list[it].maximum);
+  for(var it in list) {
+    maxData = Math.max(maxData, list[it].maximum);
 		minData = Math.min(minData, list[it].minimum);
 	}
 
 	//clear all
-	d3.select("#axis").remove();
+	d3.select("#yAxis").remove();
+	d3.select("#xAxis").remove();
   s.selectAll("line").remove();
   s.selectAll("rect").remove();
 
@@ -63,10 +63,19 @@ function plotbox(list) {
 	yScale = d3.scaleLinear().domain([minData, maxData]).range([0,400]);
 	yScaleReverted = d3.scaleLinear().domain([minData, maxData]).range([400,0]);
 
+  xScale = d3.scaleLinear().domain([1,12]).range([0,550]);
+
+  var xAxis = d3.axisBottom().scale(xScale);
+  d3.select("svg")
+	.append("g")
+	.attr("id", "xAxis")
+	.attr("transform", "translate(60,480)")
+	.call(xAxis);
+
 	var yAxis = d3.axisRight().scale(yScaleReverted);
 	d3.select("svg")
 	.append("g")
-	.attr("id", "axis")
+	.attr("id", "yAxis")
 	.attr("transform", "translate(0,80)")
 	.call(yAxis);
 
@@ -140,7 +149,6 @@ function plotbox(list) {
 	.attr("stroke-width", 2);
 
 }
-
 
 function makeData(info) {
 	var sorted = info.sort(function(a,b) { return a - b});
