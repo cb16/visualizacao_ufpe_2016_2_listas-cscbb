@@ -8,6 +8,8 @@ var boxWidth = 20;
 var maxData;
 var minData;
 
+var monthList = ["jan", "fev", "mar", "abr", "mai", "jun", "jul", "ago", "set", "out", "nov", "dez"];
+
 var s = d3.select("#boxes");
 
 function readEntrys() {
@@ -63,13 +65,13 @@ function plotbox(list) {
 	yScale = d3.scaleLinear().domain([minData, maxData]).range([0,400]);
 	yScaleReverted = d3.scaleLinear().domain([minData, maxData]).range([400,0]);
 
-  xScale = d3.scaleLinear().domain([1,12]).range([0,550]);
+  xScale = d3.scaleBand().domain(monthList).range([0,600]);
 
   var xAxis = d3.axisBottom().scale(xScale);
   d3.select("svg")
 	.append("g")
 	.attr("id", "xAxis")
-	.attr("transform", "translate(60,480)")
+	.attr("transform", "translate(35,480)")
 	.call(xAxis);
 
 	var yAxis = d3.axisRight().scale(yScaleReverted);
