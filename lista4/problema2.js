@@ -5,8 +5,88 @@ var binWidth;
 var side;
 var info = [];
 var maxInData;
+var kdeValues = [];
+var n = 0;
+var extraMargin = 5;
+
+function gaus(u) {
+  return (1.0 / Math.sqrt(2*Math.PI))*Math.pow(Math.E, (-0.5)*Math.pow(u,2));
+}
+
+function calculate(value, amp, numeros) {
+  var calc = 1/(n*amp);
+  var soma = 0;
+  for(i in numeros) {
+    var v = numeros[i];
+    soma += gaus((value - v) / amp);
+  }
+  console.log("> " + calc*soma);
+  return calc*soma;
+}
 
 function kde(numeros, amp, esq, dir, bins) {
+  //dados já processacos em info
+
+  n = numeros.length;
+
+  for(i in info) {
+    var pair = info[i];
+
+    kdeValues.push({'x': pair[0], 'y': calculate(pair[1], amp, numeros)});
+  }
+  console.log(kdeValues);
+
+  var xScale = d3.scaleLinear().domain([esq, dir]).range([0, horizontal]);
+  var yScale = d3.scaleLinear().domain([0, amp]).range([0, vertical]);
+  var yScaleReverted = d3.scaleLinear().domain([0, maxInData]).range([vertical, 0]);
+
+  var g = d3.select("#kde");
+  var s = d3.select("#kdesvg");
+
+  //clear
+  g.selectAll("path").remove();
+  s.select("#xAxis2").remove();
+  s.select("#yAxis2").remove();
+
+  var xAxis2 = d3.axisBottom().scale(xScale);
+  s.append("g")
+  .attr("id", "xAxis")
+  .attr("transform", "translate(30, 170)")
+  .call(xAxis2);
+
+  var yAxis2 = d3.axisLeft().scale(yScaleReverted);
+  s.append("g")
+  .attr("id", "yAxis")
+  .attr("transform", "translate(25,45)")
+  .call(yAxis2);
+
+  var lineFunction = d3.line()
+  .x(function(d) {
+    return xScale(d.x) + margin;
+  })
+  .y(function(d) {
+    console.log("is: " + d.y + " scaled: " + yScale(d.y) + " plus margin: " + (yScale(d.y) + margin));
+    return yScale(d.y) + margin;
+  });
+
+  g.append("path")
+  .attr("d", lineFunction(kdeValues))
+  .attr("stroke", "black")
+  .attr("stroke-width", 1)
+  .attr("fill", "none");
+
+  g.selectAll("line").data(numeros).enter()
+  .append("line")
+  .attr("x1", function(d) {
+    return xScale(d) + margin;
+  })
+  .attr("y1", margin)
+  .attr("x2", function(d) {
+    return xScale(d) + margin;
+  })
+  .attr("y2", margin + extraMargin)
+  .attr("stroke", "blue")
+  .attr("stroke-width", 1);
 
 }
 
@@ -45,8 +125,6 @@ function histogram(numeros, esq, dir, bins) {
   g.selectAll("line").remove();
   s.select("#xAxis").remove();
   s.select("#yAxis").remove();
-
-  var extraMargin = 5;
 
   var xScale = d3.scaleLinear().domain([esq, dir]).range([0, horizontal]);
   var yScale = d3.scaleLinear().domain([0, maxInData]).range([0, vertical]);
@@ -99,4 +177,5 @@ function histogram(numeros, esq, dir, bins) {
 
 function init() {
   histogram([0,0,0.5,0.6,0.75,0.75,0.8,1],0,1,10);
+  kde([0,0,0.5,0.6,0.75,0.75,0.8,1],0.5,0,1,10)
 }
