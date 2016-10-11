@@ -20,7 +20,6 @@ function calculate(value, amp, numeros) {
     var v = numeros[i];
     soma += gaus((value - v) / amp);
   }
-  console.log("> " + calc*soma);
   return calc*soma;
 }
 
@@ -29,10 +28,13 @@ function kde(numeros, amp, esq, dir, bins) {
 
   n = numeros.length;
 
+  var helper = 0;
+
   for(i in info) {
     var pair = info[i];
 
-    kdeValues.push({'x': pair[0], 'y': calculate(pair[1], amp, numeros)});
+    kdeValues.push({'x': pair[0], 'y': calculate(helper, amp, numeros)});
+    helper += side;
   }
   console.log(kdeValues);
 
@@ -62,7 +64,7 @@ function kde(numeros, amp, esq, dir, bins) {
 
   var lineFunction = d3.line()
   .x(function(d) {
-    return xScale(d.x) + margin;
+    return xScale(d.x + side/2) + margin;
   })
   .y(function(d) {
     console.log("is: " + d.y + " scaled: " + yScale(d.y) + " plus margin: " + (yScale(d.y) + margin));
