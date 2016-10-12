@@ -28,13 +28,10 @@ function kde(numeros, amp, esq, dir, bins) {
 
   n = numeros.length;
 
-  var helper = 0;
-
   for(i in info) {
     var pair = info[i];
 
-    kdeValues.push({'x': pair[0], 'y': calculate(helper, amp, numeros)});
-    helper += side;
+    kdeValues.push({'x': pair[0], 'y': calculate(pair[1], amp, numeros)});
   }
   console.log(kdeValues);
 
