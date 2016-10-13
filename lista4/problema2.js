@@ -24,20 +24,21 @@ function calculate(value, amp, numeros) {
 }
 
 function kde(numeros, amp, esq, dir, bins) {
-  //dados já processacos em info
-
   n = numeros.length;
+  var maxY = 0;
 
-  for(i in info) {
-    var pair = info[i];
-
-    kdeValues.push({'x': pair[0], 'y': calculate(pair[1], amp, numeros)});
+  for(i in numeros) {
+    kdeValues.push({'x': numeros[i], 'y': calculate(numeros[i], amp, numeros)});
   }
-  console.log(kdeValues);
+
+  for(i in kdeValues) {
+    maxY = Math.max(maxY, kdeValues[i].y);
+  }
+  //console.log(kdeValues);
 
   var xScale = d3.scaleLinear().domain([esq, dir]).range([0, horizontal]);
-  var yScale = d3.scaleLinear().domain([0, amp]).range([0, vertical]);
-  var yScaleReverted = d3.scaleLinear().domain([0, maxInData]).range([vertical, 0]);
+  var yScale = d3.scaleLinear().domain([0, maxY]).range([0, vertical]);
+  var yScaleReverted = d3.scaleLinear().domain([0, maxY]).range([vertical, 0]);
 
   var g = d3.select("#kde");
   var s = d3.select("#kdesvg");
@@ -60,11 +61,11 @@ function kde(numeros, amp, esq, dir, bins) {
   .call(yAxis2);
 
   var lineFunction = d3.line()
+  .curve(d3.curveBasis)
   .x(function(d) {
-    return xScale(d.x + side/2) + margin;
+    return xScale(d.x) + margin;
   })
   .y(function(d) {
-    console.log("is: " + d.y + " scaled: " + yScale(d.y) + " plus margin: " + (yScale(d.y) + margin));
     return yScale(d.y) + margin;
   });
 
@@ -175,6 +176,7 @@ function histogram(numeros, esq, dir, bins) {
 }
 
 function init() {
+  bandWidth = 0.15;
   histogram([0,0,0.5,0.6,0.75,0.75,0.8,1],0,1,10);
-  kde([0,0,0.5,0.6,0.75,0.75,0.8,1],0.5,0,1,10)
+  kde([0,0,0.5,0.6,0.75,0.75,0.8,1],bandWidth,0,1,10)
 }
